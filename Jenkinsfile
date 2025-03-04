@@ -4,14 +4,14 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                checkout scm
+                git 'https://github.com/linus-secondary/coffee-house.git'
             }
         }
 
         stage('Build') {
             steps {
                 script {
-                    sh 'python --version'
+                    sh 'python3 --version'
                 }
             }
         }
