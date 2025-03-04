@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/linus-secondary/coffee-house.git'
+                git url: 'https://github.com/linus-secondary/coffee-house.git', branch: 'main'
             }
         }
 
