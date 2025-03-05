@@ -43,19 +43,21 @@ pipeline {
 
         stage('Update Infra Repo') {
             steps {
-                script {
-                    sh """
-                    rm -rf coffee-house-CD
-                    git clone $INFRA_REPO
-                    cd coffee-house-CD
-                    git config user.name "Jenkins"
-                    git config user.email "jenkins@job.com"            
-                    sed -i "s|image: .*|image: ${IMAGE_NAME}:${BUILD_TAG}|" kubeManifest/deployment.yaml         
-                    git add .
-                    git commit -m "Update image to $BUILD_TAG"
-                    git push origin main
-                    """
-                }
+                withCredentials([sshUserPrivateKey(credentialsId: 'github-private-key', keyFileVariable: 'SSH_KEY')]) {
+                    script {
+                        sh """
+                        rm -rf coffee-house-CD
+                        git clone $INFRA_REPO
+                        cd coffee-house-CD
+                        git config user.name "Jenkins"
+                        git config user.email "jenkins@job.com"            
+                        sed -i "s|image: .*|image: ${IMAGE_NAME}:${BUILD_TAG}|" kubeManifest/deployment.yaml         
+                        git add .
+                        git commit -m "Update image to $BUILD_TAG"
+                        git push origin main
+                        """
+                    }
+                }    
             }
         }
 
