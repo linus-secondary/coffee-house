@@ -43,7 +43,7 @@ pipeline {
 
         stage('Update Infra Repo') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'jenkins', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'github-private-key',)]) {
                     script {
                         sh """
                         rm -rf coffee-house-CD
