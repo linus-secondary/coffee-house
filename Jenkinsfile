@@ -4,6 +4,8 @@ pipeline {
     environment {
         IMAGE_NAME = "linusindevops/coffee-house"
         IMAGE_TAG = "latest"
+        BUILD_TAG = "${env.BUILD_NUMBER}" 
+        INFRA_REPO = "git@github.com:linus-secondary/coffee-house-CD.git"
     }
 
     stages {
@@ -16,7 +18,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
+                    sh "docker build -t $IMAGE_NAME:$BUILD_TAG ."
                 }
             }
         }
@@ -34,7 +36,25 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    sh "docker push $IMAGE_NAME:$IMAGE_TAG"
+                    sh "docker push $IMAGE_NAME:$BUILD_TAG"
+                }
+            }
+        }
+
+        stage('Update Infra Repo') {
+            steps {
+                script {
+                    sh """
+                    rm -rf coffee-house-CD
+                    git clone $INFRA_REPO
+                    cd coffee-house-CD
+                    git config user.name "Jenkins"
+                    git config user.email "jenkins@job.com"            
+                    sed -i 's|image: .*$|image: $IMAGE_NAME:$BUILD_TAG|' kubeManifest/deployment.yaml            
+                    git add .
+                    git commit -m "Update image to $BUILD_TAG"
+                    git push origin main
+                    """
                 }
             }
         }
@@ -42,7 +62,7 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    sh "docker rmi $IMAGE_NAME:$IMAGE_TAG"
+                    sh "docker rmi $IMAGE_NAME:$BUILD_TAG"
                 }
             }
         }
