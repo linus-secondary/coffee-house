@@ -65,7 +65,7 @@ pipeline {
 
         stage('Update Infra Repo') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: '${CREDENTIALS_ID}',keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: "${CREDENTIALS_ID}",keyFileVariable: 'SSH_KEY')]) {
                     script {
                         sh """
                         rm -rf coffee-house-CD
