@@ -6,6 +6,8 @@ pipeline {
         IMAGE_TAG = "latest"
         BUILD_TAG = "${env.BUILD_NUMBER}" 
         INFRA_REPO = "git@github.com:linus-secondary/coffee-house-CD.git"
+        INFRA_BRANCH = 'main'
+        CREDENTIALS_ID = 'github-private-key'
     }
 
     stages {
@@ -41,20 +43,40 @@ pipeline {
             }
         }
 
+        stage('Clone INFRA Repository') {
+            steps {
+                sh 'git config --global http.sslVerify false'
+                script {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${INFRA_BRANCH}"]],
+                        userRemoteConfigs: [[credentialsId: "${CREDENTIALS_ID}",url: "${INFRA_REPO}"]],
+                        extensions: []
+                    ])
+                }
+            }
+        }
+
+        stage('List Files') {
+            steps {
+                sh 'ls -la'
+            }
+        }
+
         stage('Update Infra Repo') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'github-private-key',)]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'github-private-key',keyFileVariable: 'SSH_KEY')]) {
                     script {
                         sh """
                         rm -rf coffee-house-CD
-                        git clone $INFRA_REPO
+                        GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git clone $INFRA_REPO
                         cd coffee-house-CD
                         git config user.name "Jenkins"
                         git config user.email "jenkins@job.com"            
                         sed -i "s|image: .*|image: ${IMAGE_NAME}:${BUILD_TAG}|" kubeManifest/deployment.yaml         
                         git add .
                         git commit -m "Update image to $BUILD_TAG"
-                        git push origin main
+                        GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git push origin main
                         """
                     }
                 }    
