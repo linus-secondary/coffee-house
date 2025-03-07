@@ -60,6 +60,7 @@ pipeline {
         stage('List Files') {
             steps {
                 sh 'ls -la'
+                sh 'echo hello-world'
             }
         }
 
