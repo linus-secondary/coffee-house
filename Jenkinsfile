@@ -43,19 +43,19 @@ pipeline {
             }
         }
 
-        stage('Clone INFRA Repository') {
-            steps {
-                sh 'git config --global http.sslVerify false'
-                script {
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: "*/${INFRA_BRANCH}"]],
-                        userRemoteConfigs: [[credentialsId: "${CREDENTIALS_ID}",url: "${INFRA_REPO}"]],
-                        extensions: []
-                    ])
-                }
-            }
-        }
+        // stage('Clone INFRA Repository') {
+        //     steps {
+        //         sh 'git config --global http.sslVerify false'
+        //         script {
+        //             checkout([
+        //                 $class: 'GitSCM',
+        //                 branches: [[name: "*/${INFRA_BRANCH}"]],
+        //                 userRemoteConfigs: [[credentialsId: "${CREDENTIALS_ID}",url: "${INFRA_REPO}"]],
+        //                 extensions: []
+        //             ])
+        //         }
+        //     }
+        // }
 
         stage('List Files') {
             steps {
