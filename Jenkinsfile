@@ -74,7 +74,7 @@ pipeline {
                         cd coffee-house-CD
                         git config user.name "Jenkins"
                         git config user.email "jenkins@job.com"            
-                        sed -i "s|image: .*|image: ${IMAGE_NAME}:${BUILD_TAG}|" kubeManifest/rollout.yaml         
+                        sed -i "s|image: .*|image: ${IMAGE_NAME}:${BUILD_TAG}|" kubeManifest/deployment.yaml         
                         git add .
                         git commit -m "Update image to $BUILD_TAG"
                         GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git push origin main
